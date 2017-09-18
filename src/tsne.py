@@ -105,7 +105,7 @@ def find_optimal_sigmas(distances, target_perplexity):
     return np.array(sigmas)
 
 
-def p_joint(P):
+def p_conditional_to_joint(P):
     """Given conditional probabilities matrix P, return
     approximation of joint distribution probabilities."""
     return (P + P.T) / (2. * P.shape[0])
@@ -155,7 +155,7 @@ def tsne_grad(P, Q, Y, distances):
     return grad
 
 
-def get_joint_p_matrix(X, target_perplexity):
+def p_joint(X, target_perplexity):
     """Given a data matrix X, gives joint probabilities matrix.
 
     # Arguments
@@ -170,7 +170,7 @@ def get_joint_p_matrix(X, target_perplexity):
     # Calculate the probabilities based on these optimal sigmas
     p_conditional = calc_prob_matrix(distances, sigmas)
     # Go from conditional to joint probabilities matrix
-    P = p_joint(p_conditional)
+    P = p_conditional_to_joint(p_conditional)
     return P
 
 

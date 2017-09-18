@@ -12,7 +12,7 @@ from __future__ import print_function
 import numpy as np
 from load_data import load_mnist
 from tsne import estimate_sne, tsne_grad, symmetric_sne_grad, q_tsne, q_joint
-from tsne import get_joint_p_matrix
+from tsne import p_joint
 
 
 # Set global parameters
@@ -37,7 +37,7 @@ def main():
                       N=NUM_POINTS)
 
     # Obtain matrix of joint probabilities p_ij
-    P = get_joint_p_matrix(X, PERPLEXITY)
+    P = p_joint(X, PERPLEXITY)
 
     # Fit SNE or t-SNE
     Y = estimate_sne(X, y, P, rng,
