@@ -1,5 +1,5 @@
 """
-Function to make a categorical scatter plot
+Function to make a categorical scatter plot.
 
 Author: Liam Schoneveld
 """

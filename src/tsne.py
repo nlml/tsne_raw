@@ -216,7 +216,7 @@ def estimate_sne(X, y, P, rng, num_iters, q_fn, grad_fn, learning_rate,
 
         # Plot sometimes
         if plot and i % (num_iters / plot) == 0:
-            categorical_scatter_2d(Y, y, alpha=1.0, ms=6, show=True,
-                                   figsize=(9, 6))
+            categorical_scatter_2d(Y, y, alpha=1.0, ms=6,
+                                   show=True, figsize=(9, 6))
 
     return Y
