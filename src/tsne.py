@@ -24,15 +24,18 @@ def neg_squared_euc_dists(X):
     return -D
 
 
-def softmax(X, diag_zero=True):
+def softmax(X, diag_zero=True, zero_index=None):
     """Compute softmax values for each row of matrix X."""
 
     # Subtract max for numerical stability
     e_x = np.exp(X - np.max(X, axis=1).reshape([-1, 1]))
 
     # We usually want diagonal probailities to be 0.
-    if diag_zero:
-        np.fill_diagonal(e_x, 0.)
+    if zero_index is None:
+        if diag_zero:
+            np.fill_diagonal(e_x, 0.)
+    else:
+        e_x[:, zero_index] = 0.
 
     # Add a tiny constant for stability of log we take later
     e_x = e_x + 1e-8  # numerical stability
@@ -40,13 +43,13 @@ def softmax(X, diag_zero=True):
     return e_x / e_x.sum(axis=1).reshape([-1, 1])
 
 
-def calc_prob_matrix(distances, sigmas=None):
+def calc_prob_matrix(distances, sigmas=None, zero_index=None):
     """Convert a distances matrix to a matrix of probabilities."""
     if sigmas is not None:
         two_sig_sq = 2. * np.square(sigmas.reshape((-1, 1)))
-        return softmax(distances / two_sig_sq)
+        return softmax(distances / two_sig_sq, zero_index=zero_index)
     else:
-        return softmax(distances)
+        return softmax(distances, zero_index=zero_index)
 
 
 def binary_search(eval_fn, target, tol=1e-10, max_iter=10000,
@@ -83,10 +86,11 @@ def calc_perplexity(prob_matrix):
     return perplexity
 
 
-def perplexity(distances, sigmas):
+def perplexity(distances, sigmas, zero_index):
     """Wrapper function for quick calculation of
     perplexity over a distance matrix."""
-    return calc_perplexity(calc_prob_matrix(distances, sigmas))
+    return calc_perplexity(
+        calc_prob_matrix(distances, sigmas, zero_index))
 
 
 def find_optimal_sigmas(distances, target_perplexity):
@@ -97,7 +101,7 @@ def find_optimal_sigmas(distances, target_perplexity):
     for i in range(distances.shape[0]):
         # Make fn that returns perplexity of this row given sigma
         eval_fn = lambda sigma: \
-            perplexity(distances[i:i+1, :], np.array(sigma))
+            perplexity(distances[i:i+1, :], np.array(sigma), i)
         # Binary search over sigmas to achieve target perplexity
         correct_sigma = binary_search(eval_fn, target_perplexity)
         # Append the resulting sigma to our output array
